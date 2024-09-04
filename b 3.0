@@ -1,0 +1,162 @@
+#include <iostream>
+#include <cstring> // Dla funkcji std::strcmp, std::strncpy
+#include <cmath>
+#include <stdexcept>  // Dla std::invalid_argument
+
+// Klasa Miejscowość - pusta klasa w tym przypadku
+class Miejscowość {
+public:
+    // Można dodać później pola i metody, jeśli zajdzie taka potrzeba
+};
+
+// Klasa Budynek
+class Budynek {
+protected:
+    double metraż;          // Pole do przechowywania metrażu w metrach kwadratowych
+    char typ[20];          // Pole do przechowywania typu budynku (prywatny/publiczny) - zakładamy max 19 znaków + '\0'
+    Miejscowość* miejscowość; // Wskaźnik do miejscowości
+
+    // Statyczne liczniki dla każdego typu budynku
+    static int licznikPrywatnych;
+    static int licznikPublicznych;
+
+public:
+    // Konstruktor argumentowy
+    Budynek(double metraż, const char* typ, Miejscowość* miejscowość)
+        : miejscowość(miejscowość) {
+        setMetraż(metraż); // Używamy setera dla metrażu
+        setTyp(typ);      // Używamy setera dla typu budynku
+    }
+
+    // Destruktor
+    virtual ~Budynek() {
+        // Aktualizacja liczników przy usuwaniu instancji
+        if (std::strcmp(typ, "prywatny") == 0) {
+            --licznikPrywatnych;
+        } else if (std::strcmp(typ, "publiczny") == 0) {
+            --licznikPublicznych;
+        }
+    }
+
+    // Getter metrażu
+    double getMetraż() const {
+        return metraż;
+    }
+
+    // Setter metrażu (z walidacją)
+    void setMetraż(double metraż) {
+        if (metraż >= 10.0) {
+            this->metraż = metraż;
+        } else {
+            throw std::invalid_argument("Metraż nie może być mniejszy niż 10 m².");
+        }
+    }
+
+    // Getter typu
+    const char* getTyp() const {
+        return typ;
+    }
+
+    // Setter typu (wpływający na liczniki instancji)
+    void setTyp(const char* typ) {
+        // Aktualizacja liczników przy zmianie typu budynku
+        if (std::strcmp(this->typ, "prywatny") == 0) {
+            --licznikPrywatnych;
+        } else if (std::strcmp(this->typ, "publiczny") == 0) {
+            --licznikPublicznych;
+        }
+
+        // Ustawienie nowego typu
+        std::strncpy(this->typ, typ, sizeof(this->typ) - 1);
+        this->typ[sizeof(this->typ) - 1] = '\0'; // Zapewnienie null-terminacji
+
+        if (std::strcmp(typ, "prywatny") == 0) {
+            ++licznikPrywatnych;
+        } else if (std::strcmp(typ, "publiczny") == 0) {
+            ++licznikPublicznych;
+        }
+    }
+
+    // Getter miejscowości
+    Miejscowość* getMiejscowość() const {
+        return miejscowość;
+    }
+
+    // Setter miejscowości
+    void setMiejscowość(Miejscowość* miejscowość) {
+        this->miejscowość = miejscowość;
+    }
+
+    // Statyczne metody dostępu do liczników
+    static int getLicznikPrywatnych() {
+        return licznikPrywatnych;
+    }
+
+    static int getLicznikPublicznych() {
+        return licznikPublicznych;
+    }
+
+    // Polimorficzna metoda do obliczania podatku
+    virtual double obliczPodatek() const {
+        return 10.0 * metraż; // 10 PLN za m²
+    }
+
+    // Operator porównania ==
+    bool operator==(const Budynek& inny) const {
+        // Porównanie miejscowości - zakładamy, że porównujemy wskaźniki
+        bool miejscowośćRówne = (miejscowość == inny.miejscowość);
+
+        // Porównanie typu
+        bool typRówny = (std::strcmp(typ, inny.typ) == 0);
+
+        // Porównanie metrażu z dokładnością do 1 m²
+        bool metrażRówny = (std::abs(metraż - inny.metraż) < 1.0);
+
+        return miejscowośćRówne && typRówny && metrażRówny;
+    }
+};
+
+// Inicjalizacja statycznych liczników
+int Budynek::licznikPrywatnych = 0;
+int Budynek::licznikPublicznych = 0;
+
+// Klasa Posiadłość rozszerza klasę Budynek
+class Posiadłość : public Budynek {
+private:
+    double działkaMetraż; // Metraż działki
+
+public:
+    // Konstruktor argumentowy
+    Posiadłość(double budynekMetraż, const char* typ, Miejscowość* miejscowość, double działkaMetraż)
+        : Budynek(budynekMetraż, typ, miejscowość), działkaMetraż(działkaMetraż) {
+        if (działkaMetraż < budynekMetraż) {
+            throw std::invalid_argument("Metraż działki nie może być mniejszy od metrażu budynku.");
+        }
+    }
+
+    // Getter metrażu działki
+    double getDziałkaMetraż() const {
+        return działkaMetraż;
+    }
+
+    // Setter metrażu działki
+    void setDziałkaMetraż(double działkaMetraż) {
+        if (działkaMetraż >= getMetraż()) {
+            this->działkaMetraż = działkaMetraż;
+        } else {
+            throw std::invalid_argument("Metraż działki nie może być mniejszy od metrażu budynku.");
+        }
+    }
+
+    // Polimorficzna metoda do obliczania podatku
+    double obliczPodatek() const override {
+        double podatekBudynek = Budynek::obliczPodatek();
+        double podatekDziałka = 5.0 * (działkaMetraż - getMetraż()); // 5 PLN za m² działki przewyższającej budynek
+        return podatekBudynek + podatekDziałka;
+    }
+
+    // Mechanizm konwersji Posiadłość -> double
+    explicit operator double() const {
+        return działkaMetraż - getMetraż();
+    }
+};
