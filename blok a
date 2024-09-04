@@ -1,1 +1,139 @@
-cout<<"kocham c++";
+Plik nagłówkowy: tablica.h
+
+#ifndef TABLICA_H
+#define TABLICA_H
+
+#include <cstdint>
+
+// Funkcja do dynamicznej alokacji tablicy
+int32_t* alokujTablice(int32_t rozmiar);
+
+// Funkcja do zapisywania tablicy do pliku
+void zapiszTablice(const int32_t* tablica, const char* nazwaPliku);
+
+// Funkcja do wczytywania tablicy z pliku
+int32_t* wczytajTablice(const char* nazwaPliku);
+
+// Funkcja do dealokacji tablicy i ustawienia wskaźnika na nullptr
+void dealokujTablice(int32_t** ptr);
+
+#endif // TABLICA_H
+
+Plik implementacji: tablica.cpp
+
+#include "tablica.h"
+#include <iostream>
+#include <fstream>
+#include <cstring> // do memset
+#include <cstdlib> // do rand()
+
+int32_t* alokujTablice(int32_t rozmiar) {
+    int32_t* tablica = new int32_t[rozmiar + 1];
+    tablica[0] = rozmiar;
+    memset(tablica + 1, 0, rozmiar * sizeof(int32_t));
+    return tablica + 1;
+}
+
+void zapiszTablice(const int32_t* tablica, const char* nazwaPliku) {
+    std::ofstream plik(nazwaPliku, std::ios::binary);
+    if (!plik) {
+        std::cerr << "Nie można otworzyć pliku do zapisu!" << std::endl;
+        return;
+    }
+    int32_t rozmiar = tablica[-1];
+    plik.write(reinterpret_cast<const char*>(&rozmiar), sizeof(rozmiar));
+    plik.write(reinterpret_cast<const char*>(tablica), rozmiar * sizeof(int32_t));
+    plik.close();
+}
+
+int32_t* wczytajTablice(const char* nazwaPliku) {
+    std::ifstream plik(nazwaPliku, std::ios::binary);
+    if (!plik) {
+        std::cerr << "Nie można otworzyć pliku do odczytu!" << std::endl;
+        return nullptr;
+    }
+    int32_t rozmiar;
+    plik.read(reinterpret_cast<char*>(&rozmiar), sizeof(rozmiar));
+    int32_t* tablica = alokujTablice(rozmiar);
+    plik.read(reinterpret_cast<char*>(tablica), rozmiar * sizeof(int32_t));
+    plik.close();
+    return tablica;
+}
+
+void dealokujTablice(int32_t** ptr) {
+    if (ptr && *ptr) {
+        delete[] (*ptr - 1);
+        *ptr = nullptr;
+    }
+}
+
+Plik główny: main.cpp
+
+#include <iostream>
+#include "tablica.h"
+#include <cstdlib> // do rand() i srand()
+#include <ctime>   // do time()
+
+void wypelnijTabliceLosowo(int32_t* tablica, int32_t rozmiar) {
+    for (int32_t i = 0; i < rozmiar; ++i) {
+        tablica[i] = rand() % 100; // Losowa liczba z zakresu 0-99
+    }
+}
+
+bool porownajTablice(const int32_t* t1, const int32_t* t2) {
+    int32_t rozmiar1 = t1[-1];
+    int32_t rozmiar2 = t2[-1];
+    if (rozmiar1 != rozmiar2) return false;
+
+    for (int32_t i = 0; i < rozmiar1; ++i) {
+        if (t1[i] != t2[i]) return false;
+    }
+    return true;
+}
+
+int main() {
+    srand(static_cast<unsigned>(time(0))); // Inicjalizacja generatora liczb losowych
+
+    int32_t rozmiar1 = 10;
+    int32_t rozmiar2 = 15;
+
+    // Alokujemy i wypełniamy dwie tablice
+    int32_t* tablica1 = alokujTablice(rozmiar1);
+    int32_t* tablica2 = alokujTablice(rozmiar2);
+    
+    wypelnijTabliceLosowo(tablica1, rozmiar1);
+    wypelnijTabliceLosowo(tablica2, rozmiar2);
+
+    // Wybieramy losowo, którą tablicę zapisać
+    bool zapiszTablice1 = rand() % 2;
+    const int32_t* tablicaDoZapisu = zapiszTablice1 ? tablica1 : tablica2;
+    const char* nazwaPliku = "tablica.bin";
+
+    // Zapisujemy jedną z tablic do pliku
+    zapiszTablice(tablicaDoZapisu, nazwaPliku);
+
+    // Wczytujemy tablicę z pliku
+    int32_t* tablicaWczytana = wczytajTablice(nazwaPliku);
+
+    if (tablicaWczytana) {
+        // Porównujemy wczytaną tablicę z obiema utworzonymi
+        if (porownajTablice(tablicaWczytana, tablica1)) {
+            std::cout << "Tablica wczytana z pliku jest zgodna z tablicą 1." << std::endl;
+        } else if (porownajTablice(tablicaWczytana, tablica2)) {
+            std::cout << "Tablica wczytana z pliku jest zgodna z tablicą 2." << std::endl;
+        } else {
+            std::cout << "Tablica wczytana z pliku nie jest zgodna z żadną z tablic." << std::endl;
+        }
+
+        // Dealokujemy wczytaną tablicę
+        dealokujTablice(&tablicaWczytana);
+    } else {
+        std::cout << "Błąd podczas wczytywania tablicy z pliku." << std::endl;
+    }
+
+    // Dealokujemy utworzone tablice
+    dealokujTablice(&tablica1);
+    dealokujTablice(&tablica2);
+
+    return 0;
+}
