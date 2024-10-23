@@ -1,0 +1,49 @@
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+
+using namespace std;
+
+int main() {
+    double a, b, c;
+    cout << "Podaj współczynniki a, b, c: ";
+    cin >> a >> b >> c;
+
+    cout << fixed << setprecision(4);
+
+    if (a == 0) {
+        // Równanie sprowadza się do liniowego bx + c = 0
+        if (b == 0) {
+            if (c == 0) {
+                // a = 0, b = 0, c = 0 => Nieskończenie wiele rozwiązań
+                cout << "x: R" << endl;
+            } else {
+                // a = 0, b = 0, c != 0 => Brak rozwiązań
+                cout << "x: {}" << endl;
+            }
+        } else {
+            // a = 0, b != 0 => Jedno rozwiązanie liniowe
+            double x0 = -c / b;
+            cout << "x0 = " << x0 << endl;
+        }
+    } else {
+        // Równanie kwadratowe (a != 0)
+        double delta = b * b - 4 * a * c;
+        if (delta > 0) {
+            // Dwa różne rozwiązania
+            double sqrtDelta = sqrt(delta);
+            double x1 = (-b + sqrtDelta) / (2 * a);
+            double x2 = (-b - sqrtDelta) / (2 * a);
+            cout << "x1 = " << x1 << ", x2 = " << x2 << endl;
+        } else if (delta == 0) {
+            // Jedno podwójne rozwiązanie
+            double x = -b / (2 * a);
+            cout << "x1 = x2 = " << x << endl;
+        } else {
+            // Brak rzeczywistych rozwiązań
+            cout << "x: {}" << endl;
+        }
+    }
+
+    return 0;
+}
