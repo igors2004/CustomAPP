@@ -1,0 +1,63 @@
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+
+using namespace std;
+
+const double D = 3.05;
+const double E = 5 * 3.1415 * sqrt(5);
+const double e = 2.7182;
+
+double f(double x) {
+    return (D * cos(2 * x - 3)) / (E * sin(2 * x + 2) / 6);
+}
+
+double g(double x) {
+    return sqrt(2.5 - fabs((2.0 / 3.0) * x - 2.0)) / sqrt(e);
+}
+
+double h(double x) {
+    return (2 * E / (5 + D * x + log(x))) / (x - 1);
+}
+
+int main() {
+    double x;
+    char wybor;
+
+    cout << "Wybierz funkcję do obliczenia (f, g, h): ";
+    cin >> wybor;
+
+    cout << "Podaj wartość x: ";
+    cin >> x;
+
+    cout << fixed << setprecision(2);
+
+    if (wybor == 'f') {
+        if (E * sin(2 * x + 2) / 6 != 0) {
+            cout << "f(x) = " << f(x) << endl;
+        } else {
+            cout << "Błąd: nie można obliczyć f(x) dla podanej wartości x." << endl;
+        }
+    } else if (wybor == 'g') {
+        if (2.5 - fabs((2.0 / 3.0) * x - 2.0) >= 0) {
+            cout << "g(x) = " << g(x) << endl;
+        } else {
+            cout << "Błąd: nie można obliczyć g(x) dla podanej wartości x." << endl;
+        }
+    } else if (wybor == 'h') {
+        if (x > 1) {
+            cout << "h(x) = " << h(x) << endl;
+        } else {
+            cout << "Błąd: nie można obliczyć h(x) dla podanej wartości x." << endl;
+        }
+    } else {
+        cout << "Nieprawidłowy wybór. Obliczam domyślnie f(x)." << endl;
+        if (E * sin(2 * x + 2) / 6 != 0) {
+            cout << "f(x) = " << f(x) << endl;
+        } else {
+            cout << "Błąd: nie można obliczyć f(x) dla podanej wartości x." << endl;
+        }
+    }
+
+    return 0;
+}
