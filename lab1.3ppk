@@ -1,0 +1,76 @@
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+
+using namespace std;
+
+// Funkcja do sprawdzania, czy można zbudować trójkąt z podanych odcinków
+bool czyTrojkat(double a, double b, double c) {
+    return (a + b > c) && (a + c > b) && (b + c > a);
+}
+
+// Funkcja do obliczania pola trójkąta za pomocą wzoru Herona
+double poleTrojkata(double a, double b, double c) {
+    double p = (a + b + c) / 2;
+    return sqrt(p * (p - a) * (p - b) * (p - c));
+}
+
+// Funkcja do sprawdzania, czy trójkąt jest prostokątny (z tolerancją na błędy numeryczne)
+bool czyProstokatny(double a, double b, double c) {
+    double a2 = pow(a, 2), b2 = pow(b, 2), c2 = pow(c, 2);
+    const double TOLERANCJA = 1e-9;
+    return fabs(a2 + b2 - c2) < TOLERANCJA || fabs(a2 + c2 - b2) < TOLERANCJA || fabs(b2 + c2 - a2) < TOLERANCJA;
+}
+
+// Funkcja do sprawdzania, czy trójkąt jest równoramienny
+bool czyRownoramienny(double a, double b, double c) {
+    return (a == b) || (a == c) || (b == c);
+}
+
+// Funkcja do sprawdzania, czy trójkąt jest równoboczny
+bool czyRownoboczny(double a, double b, double c) {
+    return (a == b) && (b == c);
+}
+
+// Funkcja pomocnicza do wypisania wyników testu
+void wypiszWyniki(bool trojkat, double pole, bool rownoboczny, bool rownoramienny, bool prostokatny) {
+    if (trojkat) {
+        cout << "Trójkąt: TAK" << endl;
+        cout << "Pole: " << fixed << setprecision(4) << pole << endl;
+        cout << "Równoboczny: " << (rownoboczny ? "TAK" : "NIE") << endl;
+        cout << "Równoramienny: " << (rownoramienny ? "TAK" : "NIE") << endl;
+        cout << "Prostokątny: " << (prostokatny ? "TAK" : "NIE") << endl;
+    } else {
+        cout << "Trójkąt: NIE" << endl;
+    }
+}
+
+// Funkcja do przeprowadzania testu dla zadanych wartości
+void test(double a, double b, double c) {
+    bool trojkat = czyTrojkat(a, b, c);
+    double pole = (trojkat) ? poleTrojkata(a, b, c) : 0;
+    bool rownoboczny = (trojkat) ? czyRownoboczny(a, b, c) : false;
+    bool rownoramienny = (trojkat) ? czyRownoramienny(a, b, c) : false;
+    bool prostokatny = (trojkat) ? czyProstokatny(a, b, c) : false;
+
+    wypiszWyniki(trojkat, pole, rownoboczny, rownoramienny, prostokatny);
+}
+
+int main() {
+    // Scenariusze testowe
+    cout << "Scenariusze testowe:" << endl;
+    test(3.0, 4.0, 5.0);   // Trójkąt prostokątny
+    test(1.0, 1.0, 1.0);   // Trójkąt równoboczny
+    test(3.0, 3.0, 3.0);   // Trójkąt równoboczny
+    test(2.0, 2.0, 3.0);   // Trójkąt równoramienny
+    test(1.0, 2.0, 3.0);   // Nie jest trójkątem
+    test(5.0, 5.0, 8.0);   // Trójkąt równoramienny
+    test(5.0, 10.0, 10.0); // Trójkąt równoramienny
+
+    cout << "\nWprowadź długości boków trójkąta do własnego testu:" << endl;
+    double a, b, c;
+    cin >> a >> b >> c;
+    test(a, b, c);
+
+    return 0;
+}
