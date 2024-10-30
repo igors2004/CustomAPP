@@ -1,0 +1,115 @@
+// klasy.h
+#ifndef KLASY_H
+#define KLASY_H
+
+#include <string>
+#include <stdexcept>
+#include <iostream>
+
+class Kierowca; // Deklaracja wstępna
+
+class SamochodCiezarowy {
+private:
+    std::string numerRejestracyjny;
+    int pojemnosc;
+    Kierowca* kierowca;
+
+public:
+    SamochodCiezarowy(const std::string& numer, int poj)
+        : numerRejestracyjny(numer), pojemnosc(poj), kierowca(nullptr) {}
+
+    std::string getNumerRejestracyjny() const {
+        return numerRejestracyjny;
+    }
+
+    int getPojemnosc() const {
+        return pojemnosc;
+    }
+
+    Kierowca* getKierowca() const {
+        return kierowca;
+    }
+
+    // Przypisanie kierowcy
+    void przypiszKierowce(Kierowca* k);
+
+    // Zerwanie asocjacji z kierowcą
+    void zerwijAsocjacjeZKierowca() {
+        if (kierowca) {
+            Kierowca* tmp = kierowca;
+            kierowca = nullptr;
+            tmp->zerwijAsocjacjeZSamochodem();
+        }
+    }
+};
+
+class Kierowca {
+private:
+    std::string imie;
+    std::string nazwisko;
+    bool prawoJazdyKategoriiC;
+    SamochodCiezarowy* samochod;
+
+public:
+    Kierowca(const std::string& imie, const std::string& nazwisko, bool prawoJazdyC)
+        : imie(imie), nazwisko(nazwisko), prawoJazdyKategoriiC(prawoJazdyC), samochod(nullptr) {}
+
+    std::string getImie() const {
+        return imie;
+    }
+
+    std::string getNazwisko() const {
+        return nazwisko;
+    }
+
+    SamochodCiezarowy* getSamochod() const {
+        return samochod;
+    }
+
+    bool maPrawoJazdyKategoriiC() const {
+        return prawoJazdyKategoriiC;
+    }
+
+    // Przypisanie samochodu
+    void przypiszSamochod(SamochodCiezarowy* s) {
+        if (!prawoJazdyKategoriiC) {
+            throw std::invalid_argument("Kierowca nie ma prawa jazdy kategorii C");
+        }
+        if (samochod != s) {
+            if (samochod) {
+                zerwijAsocjacjeZSamochodem();
+            }
+            samochod = s;
+            if (samochod) {
+                samochod->przypiszKierowce(this);
+            }
+        }
+    }
+
+    // Zerwanie asocjacji z samochodem
+    void zerwijAsocjacjeZSamochodem() {
+        if (samochod) {
+            SamochodCiezarowy* tmp = samochod;
+            samochod = nullptr;
+            tmp->zerwijAsocjacjeZKierowca();
+        }
+    }
+};
+
+// Implementacja metody przypiszKierowce w klasie SamochodCiezarowy
+void SamochodCiezarowy::przypiszKierowce(Kierowca* k) {
+    if (k && !k->maPrawoJazdyKategoriiC()) {
+        throw std::invalid_argument("Kierowca nie ma prawa jazdy kategorii C");
+    }
+    if (kierowca != k) {
+        if (kierowca) {
+            zerwijAsocjacjeZKierowca();
+        }
+        kierowca = k;
+        if (kierowca) {
+            kierowca->przypiszSamochod(this);
+        }
+    }
+}
+
+#endif
