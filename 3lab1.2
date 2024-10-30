@@ -1,0 +1,32 @@
+// Flota.h
+#ifndef FLOTA_H
+#define FLOTA_H
+
+#include "klasy.h" // Zakładam, że plik klasy.h zawiera definicję klasy SamochodCiezarowy
+
+class Flota {
+private:
+    static const int MAKS_POJAZDOW = 20; // Rozmiar tablicy, maksymalna liczba pojazdów
+    SamochodCiezarowy* pojazdy[MAKS_POJAZDOW]; // Tablica wskaźników na obiekty typu SamochodCiezarowy
+    int liczbaPojazdow;  // Licznik aktualnie przypisanych pojazdów
+
+public:
+    // Konstruktor domyślny
+    Flota() : liczbaPojazdow(0) {
+        for (int i = 0; i < MAKS_POJAZDOW; ++i) {
+            pojazdy[i] = nullptr; // Ustawienie każdego wskaźnika na nullptr
+        }
+    }
+
+    // Metoda zwracająca liczbę aktualnie przypisanych pojazdów
+    int getLiczbaPojazdow() const {
+        return liczbaPojazdow;
+    }
+
+    // Metoda zwracająca liczbę wolnych wskaźników
+    int getLiczbaWolnych() const {
+        return MAKS_POJAZDOW - liczbaPojazdow;
+    }
+};
+
+#endif
