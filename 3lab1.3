@@ -1,0 +1,65 @@
+// Flota.h
+#ifndef FLOTA_H
+#define FLOTA_H
+
+#include "klasy.h" // Zakładam, że plik klasy.h zawiera definicję klasy SamochodCiezarowy
+
+class Flota {
+private:
+    static const int MAKS_POJAZDOW = 20;               // Rozmiar tablicy
+    SamochodCiezarowy* pojazdy[MAKS_POJAZDOW];         // Tablica wskaźników na obiekty SamochodCiezarowy
+    int liczbaPojazdow;                                // Licznik aktualnie przypisanych pojazdów
+
+public:
+    // Konstruktor domyślny
+    Flota() : liczbaPojazdow(0) {
+        for (int i = 0; i < MAKS_POJAZDOW; ++i) {
+            pojazdy[i] = nullptr;                      // Ustawienie każdego wskaźnika na nullptr
+        }
+    }
+
+    // Metoda zwracająca liczbę aktualnie przypisanych pojazdów
+    int getLiczbaPojazdow() const {
+        return liczbaPojazdow;
+    }
+
+    // Metoda zwracająca liczbę wolnych wskaźników
+    int getLiczbaWolnych() const {
+        return MAKS_POJAZDOW - liczbaPojazdow;
+    }
+
+    // Metoda dodająca instancję klasy SamochodCiezarowy do Floty
+    bool dodajPojazd(SamochodCiezarowy* pojazd) {
+        if (liczbaPojazdow >= MAKS_POJAZDOW) {
+            return false;  // Brak wolnych miejsc
+        }
+
+        // Sprawdzanie, czy pojazd już jest w flocie
+        for (int i = 0; i < liczbaPojazdow; ++i) {
+            if (pojazdy[i] == pojazd) {
+                return false;  // Pojazd już istnieje w flocie
+            }
+        }
+
+        // Dodanie pojazdu na pierwsze wolne miejsce
+        pojazdy[liczbaPojazdow] = pojazd;
+        liczbaPojazdow++;
+        return true;
+    }
+
+    // Metoda usuwająca instancję klasy SamochodCiezarowy z Floty
+    bool usunPojazd(SamochodCiezarowy* pojazd) {
+        for (int i = 0; i < liczbaPojazdow; ++i) {
+            if (pojazdy[i] == pojazd) {
+                // Zamiana z ostatnim pojazdem w tablicy
+                pojazdy[i] = pojazdy[liczbaPojazdow - 1];
+                pojazdy[liczbaPojazdow - 1] = nullptr;
+                liczbaPojazdow--;
+                return true;
+            }
+        }
+        return false;  // Pojazd nie znaleziony
+    }
+};
+
+#endif
