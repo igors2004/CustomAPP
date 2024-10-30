@@ -1,0 +1,88 @@
+// klasy.h
+#ifndef KLASY_H
+#define KLASY_H
+
+#include <string>
+
+class Kierowca; // Deklaracja wstępna klasy Kierowca, aby móc użyć wskaźnika w klasie SamochodCiezarowy
+
+class SamochodCiezarowy {
+private:
+    std::string numerRejestracyjny;
+    int pojemnosc;
+    Kierowca* kierowca; // Wskaźnik na kierowcę, z którym jest powiązany samochód
+
+public:
+    // Konstruktor
+    SamochodCiezarowy(const std::string& numer, int poj)
+        : numerRejestracyjny(numer), pojemnosc(poj), kierowca(nullptr) {}
+
+    // Getter dla numeru rejestracyjnego
+    std::string getNumerRejestracyjny() const {
+        return numerRejestracyjny;
+    }
+
+    // Getter dla pojemności
+    int getPojemnosc() const {
+        return pojemnosc;
+    }
+
+    // Setter dla kierowcy
+    void setKierowca(Kierowca* k) {
+        kierowca = k;
+    }
+
+    // Getter dla kierowcy
+    Kierowca* getKierowca() const {
+        return kierowca;
+    }
+};
+
+class Kierowca {
+private:
+    std::string imie;
+    std::string nazwisko;
+    SamochodCiezarowy* samochod; // Wskaźnik na samochód, którym kieruje kierowca
+
+public:
+    // Konstruktor
+    Kierowca(const std::string& imie, const std::string& nazwisko)
+        : imie(imie), nazwisko(nazwisko), samochod(nullptr) {}
+
+    // Getter dla imienia
+    std::string getImie() const {
+        return imie;
+    }
+
+    // Getter dla nazwiska
+    std::string getNazwisko() const {
+        return nazwisko;
+    }
+
+    // Setter dla samochodu
+    void setSamochod(SamochodCiezarowy* s) {
+        samochod = s;
+    }
+
+    // Getter dla samochodu
+    SamochodCiezarowy* getSamochod() const {
+        return samochod;
+    }
+};
+
+// Funkcje pomocnicze do ustawiania asocjacji obustronnej
+void przypiszKierowceDoSamochodu(SamochodCiezarowy* samochod, Kierowca* kierowca) {
+    if (samochod && kierowca) {
+        samochod->setKierowca(kierowca);
+        kierowca->setSamochod(samochod);
+    }
+}
+
+void usunAsocjacje(SamochodCiezarowy* samochod, Kierowca* kierowca) {
+    if (samochod && kierowca) {
+        samochod->setKierowca(nullptr);
+        kierowca->setSamochod(nullptr);
+    }
+}
+
+#endif
