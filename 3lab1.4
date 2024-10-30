@@ -1,0 +1,62 @@
+// Flota.h
+#ifndef FLOTA_H
+#define FLOTA_H
+
+#include "klasy.h" // Zakładam, że plik klasy.h zawiera definicję klasy SamochodCiezarowy
+#include <iostream>
+
+class Flota {
+private:
+    static const int MAKS_POJAZDOW = 20;
+    SamochodCiezarowy* pojazdy[MAKS_POJAZDOW];
+    int liczbaPojazdow;
+
+public:
+    // Konstruktor domyślny
+    Flota() : liczbaPojazdow(0) {
+        for (int i = 0; i < MAKS_POJAZDOW; ++i) {
+            pojazdy[i] = nullptr;
+        }
+    }
+
+    // Metoda dodająca pojazd
+    bool dodajPojazd(SamochodCiezarowy* pojazd) {
+        if (liczbaPojazdow >= MAKS_POJAZDOW) {
+            return false;
+        }
+        for (int i = 0; i < liczbaPojazdow; ++i) {
+            if (pojazdy[i] == pojazd) {
+                return false;
+            }
+        }
+        pojazdy[liczbaPojazdow] = pojazd;
+        liczbaPojazdow++;
+        return true;
+    }
+
+    // Metoda usuwająca pojazd
+    bool usunPojazd(SamochodCiezarowy* pojazd) {
+        for (int i = 0; i < liczbaPojazdow; ++i) {
+            if (pojazdy[i] == pojazd) {
+                pojazdy[i] = pojazdy[liczbaPojazdow - 1];
+                pojazdy[liczbaPojazdow - 1] = nullptr;
+                liczbaPojazdow--;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Operator << do wypisywania informacji o flocie
+    friend std::ostream& operator<<(std::ostream& os, const Flota& flota) {
+        os << "Flota zawiera " << flota.liczbaPojazdow << " pojazdow:\n";
+        for (int i = 0; i < flota.liczbaPojazdow; ++i) {
+            os << "Samochod " << (i + 1) << ": ";
+            os << "Numer rejestracyjny: " << flota.pojazdy[i]->getNumerRejestracyjny() << ", ";
+            os << "Pojemnosc: " << flota.pojazdy[i]->getPojemnosc() << " L\n";
+        }
+        return os;
+    }
+};
+
+#endif
