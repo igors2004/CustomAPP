@@ -1,0 +1,59 @@
+#include <iostream>
+#include <iomanip> // do formatowania wyświetlania
+using namespace std;
+
+int main() {
+    const int N = 11; // Maksymalny rozmiar tablicy
+    int n;
+
+    do {
+        cout << "Podaj rozmiar tablicy (dodatni, nieparzysty, <= " << N << "): ";
+        cin >> n;
+    } while (n <= 0 || n > N || n % 2 == 0);
+
+    int tablica[N][N] = {0}; // Inicjalizacja tablicy zerami
+
+    int lewo = 0, prawo = n - 1, gora = 0, dol = n - 1;
+    int liczbaNieparzysta = 12;
+    int liczbaParzysta = 1;
+    bool odliczanieWstecz = true;
+
+    while (lewo <= prawo && gora <= dol) {
+        // Wypełnianie górnego wiersza
+        for (int i = lewo; i <= prawo; ++i) {
+            tablica[gora][i] = odliczanieWstecz ? liczbaNieparzysta-- : liczbaParzysta++;
+        }
+        gora++;
+
+        // Wypełnianie prawej kolumny
+        for (int i = gora; i <= dol; ++i) {
+            tablica[i][prawo] = odliczanieWstecz ? liczbaNieparzysta-- : liczbaParzysta++;
+        }
+        prawo--;
+
+        // Wypełnianie dolnego wiersza
+        for (int i = prawo; i >= lewo; --i) {
+            tablica[dol][i] = odliczanieWstecz ? liczbaNieparzysta-- : liczbaParzysta++;
+        }
+        dol--;
+
+        // Wypełnianie lewej kolumny
+        for (int i = dol; i >= gora; --i) {
+            tablica[i][lewo] = odliczanieWstecz ? liczbaNieparzysta-- : liczbaParzysta++;
+        }
+        lewo++;
+
+        // Zmiana kierunku wypełniania
+        odliczanieWstecz = !odliczanieWstecz;
+    }
+
+    // Wyświetlanie tablicy
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            cout << setw(4) << tablica[i][j];
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
