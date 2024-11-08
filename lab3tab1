@@ -1,0 +1,49 @@
+#include <iostream>
+#include <cctype> // dla funkcji tolower() i toupper()
+
+using namespace std;
+
+int main() {
+    const int SIZE = 100;
+    char T[SIZE]; // Tablica T
+    char Y[SIZE]; // Tablica Y bez inicjalizacji
+
+    // Wczytanie tekstu do tablicy T
+    cout << "Wpisz tekst (maksymalnie 100 znaków): ";
+    cin >> T;
+
+    // Obliczenie długości aktywnego obszaru
+    int length = 0;
+    while (T[length] != '\0') {
+        length++;
+    }
+
+    // Przepisanie i modyfikacja znaków z T do Y w odwrotnej kolejności
+    for (int i = 0; i < length; i++) {
+        char ch = T[length - 1 - i];
+        if (islower(ch)) {
+            Y[i] = toupper(ch);
+        } else if (isupper(ch)) {
+            Y[i] = tolower(ch);
+        } else if (ch == ' ') {
+            Y[i] = '_';
+        } else {
+            Y[i] = ch;
+        }
+    }
+    Y[length] = '\0'; // Dodanie znaku '\0' na końcu
+
+    // Wyświetlenie tablicy Y
+    cout << "Tablica Y (odwrócona i zmodyfikowana): " << Y << endl;
+
+    // Porównanie tablic T i Y i liczenie identycznych znaków
+    int identicalCount = 0;
+    for (int i = 0; i < length; i++) {
+        if (T[i] == Y[i]) {
+            identicalCount++;
+        }
+    }
+    cout << "Liczba identycznych znaków w tych samych pozycjach w tablicach T i Y: " << identicalCount << endl;
+
+    return 0;
+}
