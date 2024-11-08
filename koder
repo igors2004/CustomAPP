@@ -1,0 +1,52 @@
+class Koder {
+private:
+    char* klucz;  // Wskaźnik na dynamicznie alokowaną tablicę znakową
+
+public:
+    // Konstruktor wymaga podania klucza
+    Koder(const char* initKlucz) : klucz(nullptr) {
+        if (initKlucz == nullptr || std::strlen(initKlucz) == 0) {
+            throw std::invalid_argument("Klucz nie może być pusty lub NULL");
+        }
+
+        size_t dlugosc = std::strlen(initKlucz) + 1;  // +1 dla znaku NULL
+        klucz = new char[dlugosc];
+        std::strcpy(klucz, initKlucz);
+    }
+
+    // Destruktor, zwalnia pamięć
+    ~Koder() {
+        delete[] klucz;
+    }
+
+    // Metoda jestOK(), sprawdzająca poprawność klucza
+    bool jestOK() const {
+        return klucz != nullptr && std::strlen(klucz) > 0;
+    }
+
+    // Metoda szyfruj, dostosowana do zmiennego rozmiaru klucza
+    void szyfruj(char* i_info, size_t i_liczZnak) const {
+        if (!jestOK()) {
+            throw std::runtime_error("Klucz jest nieprawidłowy");
+        }
+
+        if (i_info != nullptr && i_liczZnak > 0) {
+            size_t dlugoscKlucza = std::strlen(klucz);
+            for (size_t i = 0; i < i_liczZnak; ++i) {
+                i_info[i] ^= klucz[i % dlugoscKlucza];  // XOR z kluczem o zmiennej długości
+            }
+        }
+    }
+
+    // Metoda deszyfruj (wykorzystuje szyfruj jako odwrotną operację)
+    void deszyfruj(char* i_info, size_t i_liczZnak) const {
+        szyfruj(i_info, i_liczZnak);  // Ponowne zastosowanie XOR deszyfruje
+    }
+
+    // Zakomentowany seter klucza (na tym etapie klucz ustawiamy tylko przez konstruktor)
+    /*
+    void setKlucz(const char* nowyKlucz) {
+        // Zakomentowane zgodnie z wymaganiami zadania
+    }
+    */
+};
