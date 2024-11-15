@@ -1,0 +1,37 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+const int N = 4;
+const int M = 5;
+
+int main() {
+    srand(static_cast<unsigned int>(time(0))); // Inicjalizacja generatora liczb losowych
+
+    double tablica[N][M];
+    double* wskaznik = &tablica[0][0];
+    double* koniec = &tablica[0][0] + (N * M);
+
+    while (wskaznik < koniec) {
+        // Generowanie losowej liczby rzeczywistej
+        *wskaznik = -1.7 + static_cast<double>(rand()) / RAND_MAX * (2.2 + 1.7);
+
+        // Obliczenia odległości i współrzędnych
+        int odlegloscOdPoczatku = wskaznik - &tablica[0][0];
+        int odlegloscDoKonca = (koniec - wskaznik) - 1;
+        int wiersz = odlegloscOdPoczatku / M;
+        int kolumna = odlegloscOdPoczatku % M;
+
+        // Wyświetlenie informacji
+        cout << "Odległość od początku: " << odlegloscOdPoczatku << ", "
+             << "Odległość do końca: " << odlegloscDoKonca << ", "
+             << "Współrzędne: (" << wiersz << ", " << kolumna << "), "
+             << "Wartość: " << *wskaznik << endl;
+
+        wskaznik++;
+    }
+
+    return 0;
+}
