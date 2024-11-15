@@ -1,0 +1,35 @@
+#include <iostream>
+#include <cctype> // Do funkcji isspace()
+using namespace std;
+
+int main() {
+    char tekst[101];
+
+    // Wczytanie tekstu
+    cout << "Podaj tekst (max 100 znaków): ";
+    cin.getline(tekst, 101);
+
+    // Usunięcie białych znaków za pomocą wskaźników
+    char* odczyt = tekst; // Wskaźnik do odczytu
+    char* zapis = tekst;  // Wskaźnik do zapisu
+
+    while (*odczyt != '\0') {
+        if (!isspace(*odczyt)) {
+            *zapis = *odczyt; // Przypisanie znaku, jeśli nie jest biały
+            zapis++;          // Przesunięcie wskaźnika zapisu
+        }
+        odczyt++; // Przesunięcie wskaźnika odczytu
+    }
+    *zapis = '\0'; // Dodanie znaku końca ciągu
+
+    // Obliczenie liczby usuniętych znaków
+    int liczbaUsunietych = odczyt - zapis;
+
+    // Wyświetlenie zmodyfikowanego tekstu
+    cout << "Tekst po usunięciu białych znaków: " << tekst << endl;
+
+    // Wyświetlenie liczby usuniętych znaków
+    cout << "Liczba usuniętych białych znaków: " << liczbaUsunietych << endl;
+
+    return 0;
+}
